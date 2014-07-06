@@ -65,7 +65,6 @@ static void hands_update_proc(Layer *layer, GContext *ctx) {
   const int16_t minuteHandLength = hourHandLength - 30;
 
   GPoint minuteHand;
-  center.x +=5;
   center.y +=20;
 
   time_t now = time(NULL);
@@ -99,7 +98,7 @@ static void hands_update_proc(Layer *layer, GContext *ctx) {
 }
 
 
-static void handle_second_tick(struct tm *tick_time, TimeUnits units_changed) {
+static void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed) {
   layer_mark_dirty(window_get_root_layer(window));
 }
 
@@ -202,7 +201,7 @@ static void init(void) {
   const bool animated = true;
   window_stack_push(window, animated);
 
-  tick_timer_service_subscribe(SECOND_UNIT, handle_second_tick);
+  tick_timer_service_subscribe(MINUTE_UNIT, handle_minute_tick);
 }
 
 static void deinit(void) {
