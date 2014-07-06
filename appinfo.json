@@ -1,0 +1,81 @@
+{
+  "uuid": "ecc8f112-318f-4ee2-be16-54c63b8a1139",
+  "shortName": "PPF",
+  "longName": "Past Present Future",
+  "companyName": "Christian Reinbacher",
+  "versionCode": 1,
+  "versionLabel": "1.0.0",
+  "capabilities": [ "configurable" ],
+  "watchapp": {
+    "watchface": true
+  },
+  "appKeys": {
+		"invert": 0,
+		"bluetooth": 1,
+		"battery": 2
+	},
+
+  "resources": {
+    "media": [
+              {
+              "characterRegex": "[DW:0-9]",
+              "type": "font",
+              "name": "FONT_ROBOTO_CONDENSED_SUBSET_24",
+              "file": "fonts/Roboto-Condensed.ttf"
+              },
+              {
+              "characterRegex": "[DW:0-9]",
+              "type": "font",
+              "name": "FONT_ROBOTO_CONDENSED_SUBSET_20",
+              "file": "fonts/Roboto-Condensed.ttf"
+              },
+              {
+              "type": "png-trans",
+              "name": "IMAGE_BACKGROUND",
+              "file": "images/background.png"
+              },
+              {
+              "type": "png",
+              "name": "IMAGE_BLUETOOTH",
+              "file": "images/bt.png"
+              },
+              {
+              "type": "png",
+              "name": "IMAGE_BATTERY",
+              "file": "images/battery.png"
+              }
+    ]
+  },
+  "preferences": {
+		"embedded": true,
+		"debug": false,
+		"url": "http://wiki.pebble-autoconfig.googlecode.com/git/example/autoconfig.html",
+		"description": "This page is used to configure your <strong>Pebble&nbsp;Watch</strong>. Fill in the form and press <em>Save</em> to transfer the settings to your watch.",
+		"items": [
+              {
+              "name": "invert",
+              "title": "Invert colors?",
+              "type": "boolean",
+              "off-text": "No",
+              "on-text": "Yes",
+              "default": false
+              },
+              {
+              "name": "bluetooth",
+              "title": "Vibrate on BT disconnect?",
+              "type": "boolean",
+              "off-text": "No",
+              "on-text": "Yes",
+              "default": false
+              },
+              {
+              "name": "battery",
+              "title": "Low Battery Warning?",
+              "type": "boolean",
+              "off-text": "No",
+              "on-text": "Yes",
+              "default": false
+              }
+              ]
+	}
+}
