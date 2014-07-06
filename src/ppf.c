@@ -80,6 +80,7 @@ static void hands_update_proc(Layer *layer, GContext *ctx) {
     frame.origin.x = minuteHand.x-frame.size.w/2;
     frame.origin.y = minuteHand.y-frame.size.h/2;
     layer_set_frame(text_layer_get_layer(num_layer[i]),frame);
+    layer_set_hidden(text_layer_get_layer(num_layer[i]),false);
     
     int16_t hour_angle = (TRIG_MAX_ANGLE * ((((24-t->tm_hour+i) % 12) * 6) + ((60-t->tm_min) / 10))) / (12 * 6);
     minuteHand.y = (int16_t)(-cos_lookup(hour_angle) * (int32_t)hourHandLength / TRIG_MAX_RATIO) + center.y;
@@ -89,6 +90,7 @@ static void hands_update_proc(Layer *layer, GContext *ctx) {
     frame.origin.x = minuteHand.x-frame.size.w/2;
     frame.origin.y = minuteHand.y-frame.size.h/2;
     layer_set_frame(text_layer_get_layer(hour_layer[i]),frame);
+    layer_set_hidden(text_layer_get_layer(hour_layer[i]),false);
 
   }
   
@@ -139,6 +141,7 @@ static void window_load(Window *window) {
     text_layer_set_text_alignment(num_layer[i],GTextAlignmentCenter);
     text_layer_set_font(num_layer[i], minute_font);
     layer_add_child(window_layer,text_layer_get_layer(num_layer[i]));
+    layer_set_hidden(text_layer_get_layer(num_layer[i]),true);
     
     hour_layer[i] = text_layer_create(GRect(1,1,48,24));
     snprintf(hour_buffer[i],sizeof(hour_buffer[i]),"%d",(i+1));
@@ -148,6 +151,7 @@ static void window_load(Window *window) {
     text_layer_set_font(hour_layer[i], hour_font);
     text_layer_set_text_alignment(hour_layer[i],GTextAlignmentCenter);
     layer_add_child(window_layer,text_layer_get_layer(hour_layer[i]));
+    layer_set_hidden(text_layer_get_layer(hour_layer[i]),true);
   }
   
   layer_add_child(window_layer, hands_layer);
