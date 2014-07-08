@@ -26,6 +26,7 @@ static GBitmap *battery_bitmap;
 
 static void in_received_handler(DictionaryIterator *iter, void *context) {
   autoconfig_in_received_handler(iter, context);
+  layer_set_hidden(inverter_layer_get_layer(inverter_layer),!getInvert());
   layer_mark_dirty(window_get_root_layer(window));
 }
 
@@ -96,7 +97,7 @@ static void hands_update_proc(Layer *layer, GContext *ctx) {
   
   // draw background
   transbitmap_draw_in_rect(background_bitmap, ctx, bounds);
-  layer_set_hidden(inverter_layer_get_layer(inverter_layer),!getInvert());
+
 }
 
 
@@ -154,12 +155,13 @@ static void window_load(Window *window) {
     layer_set_hidden(text_layer_get_layer(hour_layer[i]),true);
   }
   
-  layer_add_child(window_layer, hands_layer);
   
   // Inverter Layer
   inverter_layer = inverter_layer_create(bounds);
   layer_set_hidden(inverter_layer_get_layer(inverter_layer),!getInvert());
   layer_add_child(window_layer,inverter_layer_get_layer(inverter_layer));
+  
+  layer_add_child(window_layer, hands_layer);
   
   // Bluetooth Stuff
   bluetooth_connection_service_subscribe(handle_bluetooth);

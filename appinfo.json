@@ -3,8 +3,8 @@
   "shortName": "PPF",
   "longName": "Past Present Future",
   "companyName": "Christian Reinbacher",
-  "versionCode": 4,
-  "versionLabel": "1.0.3",
+  "versionCode": 5,
+  "versionLabel": "1.0.4",
   "capabilities": [ "configurable" ],
   "watchapp": {
     "watchface": true
@@ -54,7 +54,7 @@
 		"items": [
               {
               "name": "invert",
-              "title": "Invert colors?",
+              "title": "Alternative Color Scheme?",
               "type": "boolean",
               "off-text": "No",
               "on-text": "Yes",
