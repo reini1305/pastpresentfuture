@@ -83,7 +83,8 @@ static void hands_update_proc(Layer *layer, GContext *ctx) {
     layer_set_frame(text_layer_get_layer(num_layer[i]),frame);
     layer_set_hidden(text_layer_get_layer(num_layer[i]),false);
     
-    int16_t hour_angle = (TRIG_MAX_ANGLE * ((((24-t->tm_hour+i) % 12) * 6) + ((60-t->tm_min) / 10))) / (12 * 6);
+    int16_t hour_angle = (TRIG_MAX_ANGLE * (((24-t->tm_hour+i) % 12) * 6) +
+                         ((TRIG_MAX_ANGLE * (60-t->tm_min)) / 10))     / (12 * 6);
     minuteHand.y = (int16_t)(-cos_lookup(hour_angle) * (int32_t)hourHandLength / TRIG_MAX_RATIO) + center.y;
     minuteHand.x = (int16_t)(sin_lookup(hour_angle) * (int32_t)hourHandLength / TRIG_MAX_RATIO) + center.x;
     
@@ -95,6 +96,15 @@ static void hands_update_proc(Layer *layer, GContext *ctx) {
 
   }
   
+  // draw minute line
+  if(getDrawline())
+  {
+    if(getInvert())
+      graphics_context_set_stroke_color(ctx,GColorWhite);
+    else
+      graphics_context_set_stroke_color(ctx,GColorBlack);
+    graphics_draw_line(ctx,GPoint(144/2,0),GPoint(144/2,167));
+  }
   // draw background
   transbitmap_draw_in_rect(background_bitmap, ctx, bounds);
 

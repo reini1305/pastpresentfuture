@@ -3,8 +3,8 @@
   "shortName": "PPF",
   "longName": "Past Present Future",
   "companyName": "Christian Reinbacher",
-  "versionCode": 6,
-  "versionLabel": "1.0.5",
+  "versionCode": 8,
+  "versionLabel": "1.0.7",
   "capabilities": [ "configurable" ],
   "watchapp": {
     "watchface": true
@@ -12,7 +12,8 @@
   "appKeys": {
 		"invert": 0,
 		"bluetooth": 1,
-		"battery": 2
+		"battery": 2,
+    "drawline": 3
 	},
 
   "resources": {
@@ -54,7 +55,15 @@
 		"items": [
               {
               "name": "invert",
-              "title": "Alternative Color Scheme?",
+              "title": "Alternative color scheme?",
+              "type": "boolean",
+              "off-text": "No",
+              "on-text": "Yes",
+              "default": false
+              },
+              {
+              "name": "drawline",
+              "title": "Draw indicator line?",
               "type": "boolean",
               "off-text": "No",
               "on-text": "Yes",
