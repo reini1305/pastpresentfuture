@@ -24,10 +24,23 @@ static GBitmap *bluetooth_bitmap;
 static BitmapLayer *battery_layer;
 static GBitmap *battery_bitmap;
 
+
+static void handle_battery(BatteryChargeState battery)
+{
+  if(getBattery())
+  {
+    if(battery.is_charging || battery.is_plugged || battery.charge_percent > 30)
+    layer_set_hidden(bitmap_layer_get_layer(battery_layer),true);
+    else
+    layer_set_hidden(bitmap_layer_get_layer(battery_layer),false);
+  }
+}
+
 static void in_received_handler(DictionaryIterator *iter, void *context) {
   autoconfig_in_received_handler(iter, context);
   layer_set_hidden(inverter_layer_get_layer(inverter_layer),!getInvert());
   layer_mark_dirty(window_get_root_layer(window));
+  handle_battery(battery_state_service_peek());
 }
 
 
@@ -37,17 +50,6 @@ static void handle_bluetooth(bool connected)
   {
     layer_set_hidden(bitmap_layer_get_layer(bluetooth_layer),connected);
     vibes_double_pulse();
-  }
-}
-
-static void handle_battery(BatteryChargeState battery)
-{
-  if(getBattery())
-  {
-    if(battery.is_charging || battery.is_plugged || battery.charge_percent > 19)
-      layer_set_hidden(bitmap_layer_get_layer(battery_layer),true);
-    else
-      layer_set_hidden(bitmap_layer_get_layer(battery_layer),false);
   }
 }
 
@@ -115,6 +117,43 @@ static void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed) {
   layer_mark_dirty(window_get_root_layer(window));
 }
 
+static void handle_hour_tick(struct tm *tick_time, TimeUnits units_changed) {
+  if (clock_is_24h_style()) // we need to modify the labels
+  {
+    if(tick_time->tm_hour>=2 && tick_time->tm_hour<11) // all labels to lower
+    {
+      for (int i=0;i<12;i++){
+        snprintf(hour_buffer[i],sizeof(hour_buffer[i]),"%d",(i+1));
+      }
+    }
+    else if(tick_time->tm_hour>=11 && tick_time->tm_hour<13) // 11, 12 lower, rest higher
+    {
+      for (int i=0;i<10;i++){
+        snprintf(hour_buffer[i],sizeof(hour_buffer[i]),"%d",(i+13));
+      }
+      snprintf(hour_buffer[10],sizeof(hour_buffer[10]),"11");
+      snprintf(hour_buffer[11],sizeof(hour_buffer[11]),"12");
+    }
+    else if(tick_time->tm_hour>=13 && tick_time->tm_hour<23) // all labels to higher, 12<=0
+    {
+      for (int i=0;i<11;i++){
+        snprintf(hour_buffer[i],sizeof(hour_buffer[i]),"%d",(i+13));
+      }
+      snprintf(hour_buffer[11],sizeof(hour_buffer[11]),"0");
+    }
+    else  // 1,2 to lower, rest higher
+    {
+      for (int i=2;i<12;i++){
+        snprintf(hour_buffer[i],sizeof(hour_buffer[i]),"%d",(i+13));
+      }
+      snprintf(hour_buffer[11],sizeof(hour_buffer[11]),"0");
+      snprintf(hour_buffer[0],sizeof(hour_buffer[0]),"1");
+      snprintf(hour_buffer[1],sizeof(hour_buffer[1]),"2");
+    }
+  }
+  layer_mark_dirty(window_get_root_layer(window));
+}
+
 static void window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
@@ -131,7 +170,7 @@ static void window_load(Window *window) {
   bluetooth_layer = bitmap_layer_create(GRect(1,168-30,30,30));
   bitmap_layer_set_bitmap(bluetooth_layer,bluetooth_bitmap);
   layer_set_hidden(bitmap_layer_get_layer(bluetooth_layer),true);
-  battery_layer = bitmap_layer_create(GRect(144-32,168-20,32,20));
+  battery_layer = bitmap_layer_create(GRect(143-32,167-20,32,20));
   bitmap_layer_set_bitmap(battery_layer,battery_bitmap);
   layer_set_hidden(bitmap_layer_get_layer(battery_layer),true);
   
@@ -181,6 +220,7 @@ static void window_load(Window *window) {
   // Battery Stuff
   battery_state_service_subscribe(handle_battery);
   layer_add_child(window_layer,bitmap_layer_get_layer(battery_layer));
+  handle_battery(battery_state_service_peek());
 }
 
 static void window_unload(Window *window) {
@@ -218,6 +258,7 @@ static void init(void) {
   window_stack_push(window, animated);
 
   tick_timer_service_subscribe(MINUTE_UNIT, handle_minute_tick);
+  tick_timer_service_subscribe(HOUR_UNIT, handle_hour_tick);
 }
 
 static void deinit(void) {
