@@ -3,8 +3,8 @@
   "shortName": "PPF",
   "longName": "Past Present Future",
   "companyName": "Christian Reinbacher",
-  "versionCode": 10,
-  "versionLabel": "1.0.9",
+  "versionCode": 13,
+  "versionLabel": "1.0.12",
   "capabilities": [ "configurable" ],
   "watchapp": {
     "watchface": true

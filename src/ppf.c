@@ -75,7 +75,7 @@ static void hands_update_proc(Layer *layer, GContext *ctx) {
 
   for (int i=0;i<12;i++)
   {
-    int16_t minute_angle = TRIG_MAX_ANGLE * (((60-t->tm_min)+i*5)%60) / 60;
+    int16_t minute_angle = TRIG_MAX_ANGLE * (((59-t->tm_min)+i*5)%60) / 60;
     minuteHand.y = (int16_t)(-cos_lookup(minute_angle) * (int32_t)minuteHandLength / TRIG_MAX_RATIO) + center.y;
     minuteHand.x = (int16_t)(sin_lookup(minute_angle) * (int32_t)minuteHandLength / TRIG_MAX_RATIO) + center.x;
 
@@ -112,13 +112,8 @@ static void hands_update_proc(Layer *layer, GContext *ctx) {
 
 }
 
-
-static void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed) {
-  layer_mark_dirty(window_get_root_layer(window));
-}
-
-static void handle_hour_tick(struct tm *tick_time, TimeUnits units_changed) {
-  if (clock_is_24h_style()) // we need to modify the labels
+static void handle_tick(struct tm *tick_time, TimeUnits units_changed) {
+  if (clock_is_24h_style() && units_changed==HOUR_UNIT) // we need to modify the labels
   {
     if(tick_time->tm_hour>=2 && tick_time->tm_hour<11) // all labels to lower
     {
@@ -221,6 +216,13 @@ static void window_load(Window *window) {
   battery_state_service_subscribe(handle_battery);
   layer_add_child(window_layer,bitmap_layer_get_layer(battery_layer));
   handle_battery(battery_state_service_peek());
+  
+  tick_timer_service_subscribe(MINUTE_UNIT|HOUR_UNIT, handle_tick);
+  // force update
+  time_t now = time(NULL);
+  struct tm *t = localtime(&now);
+  handle_tick(t, HOUR_UNIT);
+  //tick_timer_service_subscribe(HOUR_UNIT, handle_hour_tick);
 }
 
 static void window_unload(Window *window) {
@@ -257,8 +259,6 @@ static void init(void) {
   const bool animated = true;
   window_stack_push(window, animated);
 
-  tick_timer_service_subscribe(MINUTE_UNIT, handle_minute_tick);
-  tick_timer_service_subscribe(HOUR_UNIT, handle_hour_tick);
 }
 
 static void deinit(void) {
