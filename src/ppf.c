@@ -11,6 +11,10 @@ static TextLayer *num_layer[12];
 static char num_buffer[12][3];
 static TextLayer *hour_layer[12];
 static char hour_buffer[12][3];
+static TextLayer *date_layer;
+static char date_buffer[3];
+static bool draw_date = false;
+static AppTimer *date_timer;
 
 static Layer *hands_layer;
 static TransBitmap *background_bitmap;
@@ -51,6 +55,20 @@ static void handle_bluetooth(bool connected)
     layer_set_hidden(bitmap_layer_get_layer(bluetooth_layer),connected);
     vibes_double_pulse();
   }
+}
+
+static void disable_date(void *data)
+{
+  draw_date=false;
+  layer_mark_dirty(window_get_root_layer(window));
+}
+
+static void enable_date(void)
+{
+  draw_date=true;
+  if(!app_timer_reschedule(date_timer,2000))
+    date_timer = app_timer_register(2000,disable_date,NULL);
+  layer_mark_dirty(window_get_root_layer(window));
 }
 
 static void bg_update_proc(Layer *layer, GContext *ctx) {
@@ -109,11 +127,20 @@ static void hands_update_proc(Layer *layer, GContext *ctx) {
   }
   // draw background
   transbitmap_draw_in_rect(background_bitmap, ctx, bounds);
-
+  
+  // draw date
+  if(draw_date)
+  {
+    graphics_context_set_fill_color(ctx,GColorBlack);
+    graphics_fill_circle(ctx,GPoint(120,120),16);
+    layer_set_hidden(text_layer_get_layer(date_layer),false);
+  }
+  else
+    layer_set_hidden(text_layer_get_layer(date_layer),true);
 }
 
 static void handle_tick(struct tm *tick_time, TimeUnits units_changed) {
-  if (clock_is_24h_style() && units_changed==HOUR_UNIT) // we need to modify the labels
+  if (clock_is_24h_style()) // we need to modify the labels
   {
     if(tick_time->tm_hour>=2 && tick_time->tm_hour<11) // all labels to lower
     {
@@ -210,20 +237,39 @@ static void window_load(Window *window) {
   // Bluetooth Stuff
   bluetooth_connection_service_subscribe(handle_bluetooth);
   layer_add_child(window_layer,bitmap_layer_get_layer(bluetooth_layer));
-
   
   // Battery Stuff
   battery_state_service_subscribe(handle_battery);
   layer_add_child(window_layer,bitmap_layer_get_layer(battery_layer));
   handle_battery(battery_state_service_peek());
   
-  tick_timer_service_subscribe(MINUTE_UNIT|HOUR_UNIT, handle_tick);
+  
+  // Date Layer
+  date_layer = text_layer_create(GRect(104,105,32,32));
+  text_layer_set_text(date_layer,date_buffer);
+  text_layer_set_background_color(date_layer,GColorClear);
+  text_layer_set_text_color(date_layer,GColorWhite);
+  text_layer_set_font(date_layer,hour_font);
+  text_layer_set_text_alignment(date_layer,GTextAlignmentCenter);
+  layer_add_child(window_layer,text_layer_get_layer(date_layer));
+  layer_set_hidden(text_layer_get_layer(date_layer),true);
+  
   // force update
   time_t now = time(NULL);
   struct tm *t = localtime(&now);
-  handle_tick(t, HOUR_UNIT);
-  //tick_timer_service_subscribe(HOUR_UNIT, handle_hour_tick);
+  snprintf(date_buffer, sizeof(date_buffer), "%d",t->tm_mday);
+  handle_tick(t, MINUTE_UNIT);
+  tick_timer_service_subscribe(MINUTE_UNIT, handle_tick);
+
 }
+
+static void accel_tap_handler(AccelAxisType axis, int32_t direction) {
+  // Process tap on ACCEL_AXIS_X, ACCEL_AXIS_Y or ACCEL_AXIS_Z
+  // Direction is 1 or -1
+  // draw date if enabled
+  enable_date();
+}
+
 
 static void window_unload(Window *window) {
   layer_destroy(simple_bg_layer);
@@ -242,11 +288,13 @@ static void window_unload(Window *window) {
   bitmap_layer_destroy(battery_layer);
   bluetooth_connection_service_unsubscribe();
   battery_state_service_unsubscribe();
+  tick_timer_service_unsubscribe();
 }
 
 static void init(void) {
   autoconfig_init();
   app_message_register_inbox_received(in_received_handler);
+  accel_tap_service_subscribe(&accel_tap_handler);
 
   window = window_create();
   window_set_window_handlers(window, (WindowHandlers) {
@@ -262,9 +310,7 @@ static void init(void) {
 }
 
 static void deinit(void) {
-
-
-  tick_timer_service_unsubscribe();
+  accel_tap_service_unsubscribe();
   window_destroy(window);
   autoconfig_deinit();
 }
