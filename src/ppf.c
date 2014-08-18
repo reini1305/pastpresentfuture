@@ -237,6 +237,7 @@ static void window_load(Window *window) {
   // Bluetooth Stuff
   bluetooth_connection_service_subscribe(handle_bluetooth);
   layer_add_child(window_layer,bitmap_layer_get_layer(bluetooth_layer));
+  handle_bluetooth(bluetooth_connection_service_peek());
   
   // Battery Stuff
   battery_state_service_subscribe(handle_battery);
