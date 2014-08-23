@@ -53,7 +53,8 @@ static void handle_bluetooth(bool connected)
   if(getBluetooth())
   {
     layer_set_hidden(bitmap_layer_get_layer(bluetooth_layer),connected);
-    vibes_double_pulse();
+    if(!connected)
+      vibes_double_pulse();
   }
 }
 
