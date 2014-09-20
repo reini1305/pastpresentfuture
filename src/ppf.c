@@ -174,6 +174,7 @@ static void handle_tick(struct tm *tick_time, TimeUnits units_changed) {
       snprintf(hour_buffer[1],sizeof(hour_buffer[1]),"2");
     }
   }
+  snprintf(date_buffer, sizeof(date_buffer), "%d",tick_time->tm_mday);
   layer_mark_dirty(window_get_root_layer(window));
 }
 
