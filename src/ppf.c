@@ -275,7 +275,7 @@ static void accel_tap_handler(AccelAxisType axis, int32_t direction) {
 
 
 static void window_unload(Window *window) {
-  layer_destroy(simple_bg_layer);
+  /*layer_destroy(simple_bg_layer);
   layer_destroy(hands_layer);
   inverter_layer_destroy(inverter_layer);
   for(int i=0;i<12;i++)
@@ -288,7 +288,7 @@ static void window_unload(Window *window) {
   gbitmap_destroy(bluetooth_bitmap);
   gbitmap_destroy(battery_bitmap);
   bitmap_layer_destroy(bluetooth_layer);
-  bitmap_layer_destroy(battery_layer);
+  bitmap_layer_destroy(battery_layer);*/
   bluetooth_connection_service_unsubscribe();
   battery_state_service_unsubscribe();
   tick_timer_service_unsubscribe();

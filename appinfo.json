@@ -3,8 +3,8 @@
   "shortName": "PPF",
   "longName": "Past Present Future",
   "companyName": "Christian Reinbacher",
-  "versionCode": 19,
-  "versionLabel": "1.5",
+  "versionCode": 21,
+  "versionLabel": "1.7",
   "capabilities": [ "configurable" ],
   "watchapp": {
     "watchface": true
@@ -28,13 +28,15 @@
               "characterRegex": "[DW:0-9]",
               "type": "font",
               "name": "FONT_ROBOTO_CONDENSED_SUBSET_24",
-              "file": "fonts/Roboto-Condensed.ttf"
+              "file": "fonts/Roboto-Condensed.ttf",
+	      "compatability": "2.7"
               },
               {
               "characterRegex": "[DW:0-9]",
               "type": "font",
               "name": "FONT_ROBOTO_CONDENSED_SUBSET_20",
-              "file": "fonts/Roboto-Condensed.ttf"
+              "file": "fonts/Roboto-Condensed.ttf",
+	      "compatability": "2.7"
               },
               {
               "type": "png-trans",
@@ -57,7 +59,7 @@
 		"embedded": true,
 		"debug": false,
 		"url": "http://wiki.pebble-autoconfig.googlecode.com/git/example/autoconfig.html",
-		"description": "This page is used to configure your <strong>Pebble&nbsp;Watch</strong>. Fill in the form and press <em>Save</em> to transfer the settings to your watch.",
+		"description": "This page is used to configure <strong>Past, Present, Future</strong>. Fill in the form and press <em>Save</em> to transfer the settings to your watch. If you like what I'm doing, consider a donation: <br><a href='https://pledgie.com/campaigns/28156'><img alt='Click here to lend your support to: Christian Reinbachers Pebble Apps and make a donation at pledgie.com !' src='https://pledgie.com/campaigns/28156.png?skin_name=chrome' border='0' ></a>",
 		"items": [
               {
               "name": "invert",
